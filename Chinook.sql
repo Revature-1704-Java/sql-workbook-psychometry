@@ -37,12 +37,13 @@ begin
 end;
 /
 
-create or replace function get_average_total return number is x Number;
+create or replace function get_average_price return number is x Number;
 begin
     select avg(total) into x from invoice;
     return x;
 end;
 /
+select get_average_price() from dual;
 
 create or replace function get_most_expensive_track return varchar2 is x number; n varchar2(100);
 begin
@@ -51,15 +52,26 @@ begin
     return n;
 end;
 /
-
 select GET_MOST_EXPENSIVE_TRACK() from dual;
 
-create or replace function get_average_price return number is x Number;
+create or replace function get_average_total return number is 
+x Number;
+sum1 Number;
+sum2 Number;
 begin
-    select avg(unitprice) into x from invoiceline;
+    sum1:=0;
+    sum2:=0;
+    for i in (select unitprice*quantity u, quantity from invoiceline)
+    loop
+        sum1:=sum1+i.u;
+        sum2:=sum2+i.quantity;
+    end loop;
+    x:=sum1/sum2;
     return x;
 end;
 /
+select get_average_total() from dual;
+
 create or replace type EmployeeType as object(
     employeeid integer,
     lastname varchar2(20),
